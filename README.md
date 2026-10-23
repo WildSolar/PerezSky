@@ -66,7 +66,8 @@ their own formulas.
 
 - `clamp=True`: ε ∈ [1, 12.01) and Δ ∈ [0.01, 0.6], as gendaylit does.
 - `brightness_correction=True`: Δ ≥ 0.2 for 1.065 < ε < 2.8 when computing a..e, as
-  gendaylit does (a correction of the model for intermediate skies).
+  gendaylit does. gendaylit marks it as a correction of the Perez model, without a
+  reference; see the section below.
 - `limit_gradation=True`: b ≤ 0.
   - For very bright overcast skies (e.g. cloud enhancement over snow, GHI ≈ 700 W/m² with
     DNI ≈ 0) and for clear skies with a very low sun, the model gives b > 0.
@@ -74,6 +75,27 @@ their own formulas.
     received up to 30 times the GHI in a real data set.
   - gendaylit refuses such skies and outputs a black sky ("positive Perez parameter B");
     perezsky caps b at 0 instead.
+
+**The brightness correction.** It changes only the *shape* of the distribution; the
+normalisation to the actual DHI stays the same.
+
+- **Where it acts:** on dark skies of intermediate clearness (thin or broken cloud with little
+  diffuse light, Δ < 0.2 for 1.065 < ε < 2.8).
+- **Why it is needed:** the parameters are linear in Δ and were fitted to measured skies. For
+  low Δ in categories 2–5 they extrapolate to a gradation 1 + a·exp(b/cos ζ) with
+  a·exp(b) ≈ −1. The zenith then becomes almost black, and the horizon up to 3.5 times
+  brighter than the average sky radiance DHI/π. Real skies of this type do not look like that.
+- **What it does:** raising Δ to 0.2 makes b more negative. The gradation then approaches 1
+  only close to the horizon, which gives a moderately brighter horizon and a zenith of 0.4–1.0
+  times the average radiance.
+- **Size of the effect:** in such hours the sky-diffuse irradiance on vertical planes drops by
+  a median of 4–15% (up to about 45%). In the opposite direction, a few very dark skies
+  (Δ ≈ 0.05) gain up to 25%.
+- **How often:** such hours make up 1–2% of the daylight hours (Davos PVGIS TMY, Greensboro
+  TMY3). Annual sums change by at most 0.2% of the sky-diffuse and 0.1% of the total
+  irradiation, on any plane.
+
+See [validation/results/brightness_correction.md](validation/results/brightness_correction.md).
 
 **Other settings.**
 

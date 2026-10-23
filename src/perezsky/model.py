@@ -110,7 +110,10 @@ def perez_parameters(dni, dhi, solar_zenith, *, day_of_year=None, solar_constant
         epsilon in [1, 12.01) and Delta in [0.01, 0.6], as Radiance's gendaylit does.
     brightness_correction : bool
         Raise Delta to at least 0.2 for 1.065 < epsilon < 2.8 before computing a..e, as
-        gendaylit does (a published correction of the model for intermediate skies).
+        gendaylit does (marked there as a correction of the Perez model, without a reference).
+        Without it, dark intermediate skies get a zenith luminance near zero and a horizon
+        several times brighter than the average sky (see README). Only the shape changes; the
+        normalisation to DHI is unaffected.
     limit_gradation : bool
         Cap the gradation parameter b at 0. For b > 0, which occurs for very bright skies
         (high Delta, e.g. cloud enhancement over snow), the gradation 1 + a exp(b / cos zeta)

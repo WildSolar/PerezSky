@@ -21,8 +21,9 @@ dependencies = ["perezsky[plot]"]
 perezsky = { path = "C:/Users/wimm/Documents/packages/PerezSky", editable = true }
 ```
 
-To freeze a finished project, use `{ git = "<repo url>", tag = "vX.Y.Z" }` instead. Don't copy
-the code into the other project.
+To freeze a finished project, use
+`{ git = "https://github.zhaw.ch/FGEE/PerezSky.git", tag = "vX.Y.Z" }` instead. Don't copy the
+code into the other project.
 
 ```python
 import perezsky as ps
