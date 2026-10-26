@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata from this file."
+type: software
+title: "perezsky: Perez all-weather sky radiance distribution, plane irradiance and horizon masking"
+abstract: >-
+  Python implementation of the Perez (1993) all-weather sky as a radiance or luminance
+  distribution on a discretised hemisphere, normalised to measured irradiance, with irradiance
+  on arbitrarily oriented planes, masking by a local horizon with a terrain model, Perez (1990)
+  luminous efficacy and export to Radiance. Validated against Radiance's gendaylit and rtrace.
+authors:
+  - family-names: Wild
+    given-names: Michael
+    orcid: "https://orcid.org/0000-0002-7730-3064"
+    affiliation: "ZHAW Zurich University of Applied Sciences"
+version: 1.0.0
+license: MIT
+repository-code: "https://github.com/WildSolar/PerezSky"
+keywords:
+  - solar energy
+  - sky model
+  - Perez
+  - diffuse irradiance
+  - photovoltaics
+  - daylighting
+  - Radiance

@@ -12,7 +12,7 @@ from .model import (PerezParameters, airmass, extraterrestrial_irradiance, lumin
 from .radiance import radiance_sky, write_radiance_sky
 from .sky import Sky, buie_sunshape, perez_sky, poa_irradiance
 
-__version__ = "0.1.0"
+__version__ = "1.0.0"
 
 __all__ = [
     "Horizon", "PerezParameters", "Sky", "SkyGrid",

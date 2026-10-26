@@ -10,10 +10,10 @@ hemisphere, normalised to measured irradiance. On top of it:
 - a polar plot of the sky.
 
 The implementation is validated against Radiance's `gendaylit` and `rtrace`
-([validation/results/validation.md](validation/results/validation.md)).
+([validation/results/validation.md](https://github.com/WildSolar/PerezSky/blob/main/validation/results/validation.md)).
 
 ```bash
-uv pip install -e ".[plot]"        # or as a uv path source, see CLAUDE.md
+pip install perezsky              # with plotting: pip install "perezsky[plot]"
 ```
 
 ## Quick start
@@ -95,7 +95,7 @@ normalisation to the actual DHI stays the same.
   TMY3). Annual sums change by at most 0.2% of the sky-diffuse and 0.1% of the total
   irradiation, on any plane.
 
-See [validation/results/brightness_correction.md](validation/results/brightness_correction.md).
+See [validation/results/brightness_correction.md](https://github.com/WildSolar/PerezSky/blob/main/validation/results/brightness_correction.md).
 
 **Other settings.**
 
@@ -193,7 +193,7 @@ several deviations from the published model. All of them are corrected here:
 ## Validation
 
 `validation/validate.py` (needs Radiance and pvlib) writes
-[validation/results/validation.md](validation/results/validation.md):
+[validation/results/validation.md](https://github.com/WildSolar/PerezSky/blob/main/validation/results/validation.md):
 
 - **Parameters and luminous efficacies vs. gendaylit:** 86 sky conditions, solar altitudes
   5–80°, overcast to clear. Agreement within gendaylit's print precision:
@@ -209,6 +209,15 @@ several deviations from the published model. All of them are corrected here:
 
 The tests (`pytest`) include the gendaylit and rtrace comparisons, marked `radiance` and skipped
 without Radiance.
+
+## Citation
+
+If you use perezsky in published work, please cite the archived version on Zenodo (see
+[CITATION.cff](https://github.com/WildSolar/PerezSky/blob/main/CITATION.cff); the DOI badge is added with the first release).
+
+## License
+
+MIT, see [LICENSE](https://github.com/WildSolar/PerezSky/blob/main/LICENSE).
 
 ## References
 

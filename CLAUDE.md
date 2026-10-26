@@ -21,9 +21,12 @@ dependencies = ["perezsky[plot]"]
 perezsky = { path = "C:/Users/wimm/Documents/packages/PerezSky", editable = true }
 ```
 
-To freeze a finished project, use
-`{ git = "https://github.zhaw.ch/FGEE/PerezSky.git", tag = "vX.Y.Z" }` instead. Don't copy the
-code into the other project.
+To freeze a finished project, depend on a released version from PyPI instead
+(`perezsky>=1.0`, without the uv source). Don't copy the code into the other project.
+Public repository: https://github.com/WildSolar/PerezSky; releases are archived on Zenodo and
+published to PyPI by `.github/workflows/publish.yml` (trusted publishing) when a GitHub release
+is published. Bump the version in `pyproject.toml`, `src/perezsky/__init__.py` and
+`CITATION.cff` together.
 
 ```python
 import perezsky as ps
