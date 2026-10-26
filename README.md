@@ -1,5 +1,8 @@
 # perezsky
 
+[![PyPI](https://img.shields.io/pypi/v/perezsky)](https://pypi.org/project/perezsky/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23666376.svg)](https://doi.org/10.5281/zenodo.23666376)
+
 The Perez (1993) all-weather sky as a radiance (or luminance) distribution on a discretised
 hemisphere, normalised to measured irradiance. On top of it:
 
@@ -212,8 +215,13 @@ without Radiance.
 
 ## Citation
 
-If you use perezsky in published work, please cite the archived version on Zenodo (see
-[CITATION.cff](https://github.com/WildSolar/PerezSky/blob/main/CITATION.cff); the DOI badge is added with the first release).
+If you use perezsky in published work, please cite the version you used, archived on Zenodo:
+
+> M. Wild: *perezsky: Perez all-weather sky radiance distribution, plane irradiance and horizon
+> masking*, version 1.0.0, Zenodo, 2026. https://doi.org/10.5281/zenodo.23666377
+
+The DOI [10.5281/zenodo.23666376](https://doi.org/10.5281/zenodo.23666376) always resolves to the latest version. Citation
+metadata: [CITATION.cff](https://github.com/WildSolar/PerezSky/blob/main/CITATION.cff).
 
 ## License
 
