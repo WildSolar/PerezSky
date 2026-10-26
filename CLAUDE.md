@@ -4,7 +4,7 @@ Python package for the Perez (1993) all-weather sky: radiance/luminance distribu
 discretised hemisphere, normalised to measured DNI/DHI. Also covers plane irradiance (incl.
 long time series), horizon masking with a terrain model, Perez (1990) luminous efficacy and
 export to Radiance. Validated against Radiance's gendaylit and rtrace. Extracted from the
-slopevf project (`C:\Users\wimm\Documents\GitHub\slopevf`), where the same model was corrected
+slopevf project (`C:\Users\wimm\Documents\packages\slopevf`), where the same model was corrected
 relative to the user's older MATLAB code. `README.md` is the full user documentation.
 
 Released: PyPI `perezsky` 1.0.0, https://github.com/WildSolar/PerezSky, Zenodo concept DOI
