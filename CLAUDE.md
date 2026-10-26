@@ -4,9 +4,12 @@ Python package for the Perez (1993) all-weather sky: radiance/luminance distribu
 discretised hemisphere, normalised to measured DNI/DHI. Also covers plane irradiance (incl.
 long time series), horizon masking with a terrain model, Perez (1990) luminous efficacy and
 export to Radiance. Validated against Radiance's gendaylit and rtrace. Extracted from the
-slopevf project (`C:\Users\wimm\Documents\GitHub\General_Irradiation_Model\python`), where the
-same model was corrected relative to the user's older MATLAB code. `README.md` is the full user
-documentation.
+slopevf project (`C:\Users\wimm\Documents\GitHub\slopevf`), where the same model was corrected
+relative to the user's older MATLAB code. `README.md` is the full user documentation.
+
+Released: PyPI `perezsky` 1.0.0, https://github.com/WildSolar/PerezSky, Zenodo concept DOI
+10.5281/zenodo.23666376 (version 1.0.0: 10.5281/zenodo.23666377). Cite the version DOI in
+publications.
 
 ## Using it from another project
 
@@ -21,12 +24,9 @@ dependencies = ["perezsky[plot]"]
 perezsky = { path = "C:/Users/wimm/Documents/packages/PerezSky", editable = true }
 ```
 
-To freeze a finished project, depend on a released version from PyPI instead
-(`perezsky>=1.0`, without the uv source). Don't copy the code into the other project.
-Public repository: https://github.com/WildSolar/PerezSky; releases are archived on Zenodo and
-published to PyPI by `.github/workflows/publish.yml` (trusted publishing) when a GitHub release
-is published. Bump the version in `pyproject.toml`, `src/perezsky/__init__.py` and
-`CITATION.cff` together.
+To freeze a finished project, or for code that others install, depend on a released version
+from PyPI instead (`"perezsky>=1.0"`, without the uv source). Don't copy the code into the
+other project.
 
 ```python
 import perezsky as ps
@@ -75,6 +75,10 @@ Pitfalls:
 
 ## Working on this repository
 
+- Releases: bump the version in `pyproject.toml`, `src/perezsky/__init__.py` and
+  `CITATION.cff` together; the user publishes a GitHub release `vX.Y.Z`, which Zenodo archives
+  and `.github/workflows/publish.yml` publishes to PyPI (trusted publishing). Then add the new
+  version DOI to `CITATION.cff` and the README citation.
 - Tests: `.venv\Scripts\python.exe -m pytest -q -p no:cacheprovider`. The `radiance` tests
   compare with gendaylit/rtrace and need `RADIANCE_DIR` (here `C:\Users\wimm\tools\Radiance`);
   without it they are skipped. Run the full suite with Radiance before committing.
