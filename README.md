@@ -152,6 +152,31 @@ sky: the masked part is replaced anyway.
 The deviations were determined with Radiance in the slopevf project. Negative horizon
 elevations are treated as 0.
 
+## Many viewpoints: cumulative sky
+
+When one weather series is needed at many viewpoints, each with its own horizon and plane
+(points on façades or roofs, a grid over a site), `CumulativeSky` computes the free Perez sky
+once, summed per sky cell and period, and then gives the irradiation of each plane at each
+viewpoint in a few milliseconds:
+
+```python
+cs = ps.CumulativeSky(dni, solar_zenith, solar_azimuth, dhi=dhi, day_of_year=doy,
+                      periods=times.month - 1)          # optional; default: one period
+for hor_az, hor_el, tilt, azimuth in points:
+    hor = ps.Horizon(hor_az, hor_el, albedo=0.2)        # terrain model as for perez_sky
+    out = cs.irradiance(tilt, azimuth, horizon=hor, albedo=0.2)
+    out["total"]                                        # (n_periods,) Wh/m² for hourly W/m² input
+```
+
+The results are the sums of `poa_irradiance` with the same horizon, terrain model and albedo.
+The one approximation is the beam on the terrain seen below the horizon (`terrain="facing"`):
+the terrain normal depends on the cell azimuth, and cells are grouped in 0.5° azimuth bins for
+it (`azimuth_bins=720`). On a test series with several horizons and planes the annual totals
+agree with `poa_irradiance` within 1·10⁻⁵. Per call the cost is a few dot products over the sky
+cells plus one pass over the daylight time steps (about 1 ms for 300 steps on a laptop).
+`step_hours` scales the sums for time steps other than one hour. The ground albedo is a scalar
+here.
+
 ## Luminance
 
 `perez_sky(..., quantity="luminance")` gives luminance [cd/m²] and illuminance [lux].
