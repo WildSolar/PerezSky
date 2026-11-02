@@ -177,6 +177,14 @@ cells plus one pass over the daylight time steps (about 1 ms for 300 steps on a 
 `step_hours` scales the sums for time steps other than one hour. The ground albedo is a scalar
 here.
 
+**Overhangs.** An object above the viewpoint (eave, canopy, balcony slab) cannot be expressed as
+a horizon, which only rises from the horizontal. Pass it as
+`cs.irradiance(..., overhang=ps.Overhang(azimuth, elevation, albedo=0.2))`: sky cells above the
+overhang's lower edge see its underside, lit by the ground's reflection of the free GHI
+(radiance albedo_overhang · albedo_ground · GHI / π), and the direct beam is blocked while the
+sun is above it. The terrain below the horizon keeps its own sun visibility. Tested against an
+hourly evaluation with the same cell-by-cell model.
+
 ## Luminance
 
 `perez_sky(..., quantity="luminance")` gives luminance [cd/m²] and illuminance [lux].

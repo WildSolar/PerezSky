@@ -16,12 +16,41 @@ grouped into ``azimuth_bins`` bins for it.
 from __future__ import annotations
 
 import warnings
+from dataclasses import dataclass
 
 import numpy as np
 
 from .grid import SkyGrid, direction_vector, make_sky_grid, surface_normal
 from .horizon import Horizon
 from .sky import perez_sky
+
+
+@dataclass(frozen=True)
+class Overhang:
+    """An object above a viewpoint that hides part of the upper sky: eave, canopy, balcony slab.
+
+    ``elevation`` [deg] per ``azimuth`` [deg, north = 0, clockwise]: above it the viewpoint sees
+    the underside instead of the sky (90 = nothing above in that direction). The underside is
+    Lambertian with ``albedo`` and lit only by the ground's reflection of the free global
+    horizontal irradiance: radiance ``albedo * ground_albedo * GHI / pi``.
+    """
+
+    azimuth: np.ndarray
+    elevation: np.ndarray
+    albedo: float = 0.2
+
+    def __post_init__(self):
+        az = np.asarray(self.azimuth, dtype=float).ravel() % 360.0
+        el = np.asarray(self.elevation, dtype=float).ravel()
+        if az.shape != el.shape or az.size < 2:
+            raise ValueError("azimuth and elevation must be 1-D arrays of equal length (>= 2)")
+        order = np.argsort(az)
+        object.__setattr__(self, "azimuth", az[order])
+        object.__setattr__(self, "elevation", np.clip(el[order], 0.0, 90.0))
+
+    def elevation_at(self, azimuth):
+        """Lower edge of the overhang [deg] at azimuths [deg] (periodic linear interpolation)."""
+        return np.interp(np.asarray(azimuth, dtype=float) % 360.0, self.azimuth, self.elevation, period=360.0)
 
 
 class CumulativeSky:
@@ -135,7 +164,7 @@ class CumulativeSky:
         return self._terrain_cos_cache[key]
 
     def irradiance(self, tilt: float, azimuth: float, horizon: Horizon | None = None,
-                   albedo: float = 0.2) -> dict:
+                   albedo: float = 0.2, overhang: Overhang | None = None) -> dict:
         """Irradiation of one plane at one viewpoint, per period.
 
         Parameters
@@ -147,6 +176,10 @@ class CumulativeSky:
             radiance of the terrain seen below it (as in :func:`perezsky.perez_sky`).
         albedo : float
             Albedo of the ground below the plane (as in :meth:`Sky.plane_irradiance`).
+        overhang : Overhang, optional
+            An object above the viewpoint (eave, canopy, balcony slab): sky cells above its
+            elevation profile see its underside instead of the sky, and the beam is blocked
+            while the sun is above it. Takes precedence over the horizon where both apply.
 
         Returns
         -------
@@ -162,8 +195,18 @@ class CumulativeSky:
         else:
             masked = ~horizon.is_visible(g.elevation, g.azimuth)
             sun_visible = horizon.is_visible(self.sun_elevation, self.sun_azimuth)
+        covered = np.zeros(g.size, dtype=bool)
+        beam_visible = sun_visible                 # direct beam on the plane; the terrain keeps sun_visible
+        if overhang is not None:
+            covered = g.elevation > overhang.elevation_at(g.azimuth)
+            masked &= ~covered
+            beam_visible = sun_visible & (self.sun_elevation <= overhang.elevation_at(self.sun_azimuth))
 
-        received = (weights * ~masked) @ self.Lbar                                     # (2, P)
+        received = (weights * ~(masked | covered)) @ self.Lbar                       # (2, P)
+        if covered.any():
+            # underside of the overhang: Lambertian, lit by the ground reflection of the free GHI
+            soffit = overhang.albedo * albedo * self.ghi_free / np.pi @ self._onehot_all
+            received += weights[:, covered].sum(axis=1)[:, None] * soffit[None, :]
         if masked.any():
             wm = weights[:, masked]
             a = horizon.albedo
@@ -179,7 +222,7 @@ class CumulativeSky:
                 beam_t = (per_bin @ self._terrain_cos(horizon.terrain_tilt)) * (self.dni * sun_visible)
                 received += (a / np.pi) * (beam_t @ self._onehot_all)
 
-        point_beam = self.beam_normal * sun_visible
+        point_beam = self.beam_normal * beam_visible
         beam = (point_beam * np.maximum(self.sun @ normal, 0.0)) @ self._onehot_all
         ghi_local = received[1] + (point_beam * self.sin_sun) @ self._onehot_all
         ground = albedo * ghi_local * (1 - normal[2]) / 2

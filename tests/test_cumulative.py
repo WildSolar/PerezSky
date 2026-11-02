@@ -62,6 +62,43 @@ def test_matches_hourly(cum, name):
             np.testing.assert_allclose(got[k], monthly, err_msg=f"{name} {tilt}/{az} {k}", **tol)
 
 
+def _hourly_with_overhang(tilt, az, hor, over, albedo):
+    """Reference: hourly sky with the overhang applied cell by cell (soffit lit by the ground)."""
+    import warnings
+    grid = ps.make_sky_grid("low")
+    covered = grid.elevation > over.elevation_at(grid.azimuth)
+    valid = np.flatnonzero((S["zen"] < 90) & (S["dni"] + S["dhi"] > 0))
+    out = {k: np.zeros(12) for k in ("beam", "sky", "ground", "total")}
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        sky = ps.perez_sky(S["dni"][valid], S["zen"][valid], S["az"][valid], dhi=S["dhi"][valid],
+                           day_of_year=S["doy"][valid], grid=grid, horizon=hor)
+    ghi_free = S["dhi"][valid] + S["dni"][valid] * np.cos(np.radians(S["zen"][valid]))
+    sky.L[covered] = over.albedo * albedo * ghi_free / np.pi
+    sky.beam = sky.beam * (90.0 - S["zen"][valid] <= over.elevation_at(S["az"][valid]))
+    res = sky.plane_irradiance(tilt, az, albedo)
+    for k in out:
+        out[k] = np.bincount(S["month"][valid], weights=res[k][:, 0], minlength=12)
+    return out
+
+
+@pytest.mark.parametrize("name", ["none", "street"])
+def test_overhang_matches_hourly(cum, name):
+    az = np.arange(0, 360, 1.0)
+    phi = np.radians((az - 180 + 180) % 360 - 180)                 # eave above a south façade
+    el = np.where(np.cos(phi) > 1e-6, np.degrees(np.arctan2(2.0, 0.8 / np.maximum(np.cos(phi), 1e-6))), 90.0)
+    over = ps.Overhang(az, el, albedo=0.3)
+    for tilt, plane_az in [(90, 180), (60, 200), (0, 0)]:
+        ref = _hourly_with_overhang(tilt, plane_az, HORIZONS[name], over, 0.25)
+        got = cum.irradiance(tilt, plane_az, HORIZONS[name], 0.25, overhang=over)
+        for k in ref:
+            np.testing.assert_allclose(got[k], ref[k], rtol=2e-4, atol=0.05, err_msg=f"{name} {tilt} {k}")
+    # nothing above (90 deg everywhere) changes nothing
+    none = ps.Overhang([0, 180], [90, 90])
+    np.testing.assert_allclose(cum.irradiance(30, 180, HORIZONS[name], overhang=none)["total"],
+                               cum.irradiance(30, 180, HORIZONS[name])["total"], rtol=1e-12)
+
+
 def test_periods_and_step_hours():
     one = ps.CumulativeSky(S["dni"], S["zen"], S["az"], dhi=S["dhi"], grid="low", step_hours=0.5)
     twelve = ps.CumulativeSky(S["dni"], S["zen"], S["az"], dhi=S["dhi"], grid="low", periods=S["month"])
